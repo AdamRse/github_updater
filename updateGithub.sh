@@ -7,7 +7,9 @@
 #
 # Logs : journalctl -u update-github.service -f
 
+
 USERNAME="AdamRse"
+ABS=""
 API_URL="https://api.github.com/users/$USERNAME/events/public"
 REPO_PATH="/home/adam/dev/projets/NOTES-DE-COURS"
 
