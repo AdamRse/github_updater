@@ -1,0 +1,24 @@
+janv. 03 16:09:44 ori updateGithub.sh[242126]: Dernier commit public :
+janv. 03 16:09:44 ori updateGithub.sh[242126]: Aucun commit public trouvé
+janv. 03 16:09:44 ori updateGithub.sh[242126]: Envoi du commit par sécurité, nouvelle tentative dans 23h
+janv. 03 16:09:44 ori updateGithub.sh[242142]: Bad owner or permissions on /home/adam/.ssh/config
+janv. 03 16:09:44 ori updateGithub.sh[242141]: fatal : Impossible de lire le dépôt distant.
+janv. 03 16:09:44 ori updateGithub.sh[242141]: Veuillez vérifier que vous avez les droits d'accès
+janv. 03 16:09:44 ori updateGithub.sh[242141]: et que le dépôt existe.
+janv. 03 16:09:44 ori updateGithub.sh[242126]: Erreur lord de l'envoi du commit de citations, arrêt du programme.
+janv. 03 16:09:44 ori systemd[1]: update-github.service: Main process exited, code=exited, status=1/FAILURE
+janv. 03 16:09:44 ori systemd[1]: update-github.service: Failed with result 'exit-code'.
+janv. 03 16:09:54 ori systemd[1]: update-github.service: Scheduled restart job, restart counter is at 15075.
+janv. 03 16:09:54 ori systemd[1]: Started update-github.service - Met à jour le repo github NOTES-DE-COURS si aucun commit public n'a été effectué dans les 24h.
+janv. 03 16:09:54 ori updateGithub.sh[242256]: 2026-01/03 16:09:54 -- CYCLE 1 --
+janv. 03 16:09:54 ori updateGithub.sh[242260]: jq: error (at <stdin>:1): Cannot index string with string "type"
+janv. 03 16:09:54 ori updateGithub.sh[242256]: Dernier commit public :
+janv. 03 16:09:54 ori updateGithub.sh[242256]: Aucun commit public trouvé
+janv. 03 16:09:54 ori updateGithub.sh[242256]: Envoi du commit par sécurité, nouvelle tentative dans 23h
+janv. 03 16:09:54 ori updateGithub.sh[242265]: Bad owner or permissions on /home/adam/.ssh/config
+janv. 03 16:09:54 ori updateGithub.sh[242264]: fatal : Impossible de lire le dépôt distant.
+janv. 03 16:09:54 ori updateGithub.sh[242264]: Veuillez vérifier que vous avez les droits d'accès
+janv. 03 16:09:54 ori updateGithub.sh[242264]: et que le dépôt existe.
+janv. 03 16:09:54 ori updateGithub.sh[242256]: Erreur lord de l'envoi du commit de citations, arrêt du programme.
+janv. 03 16:09:54 ori systemd[1]: update-github.service: Main process exited, code=exited, status=1/FAILURE
+janv. 03 16:09:54 ori systemd[1]: update-github.service: Failed with result 'exit-code'.
