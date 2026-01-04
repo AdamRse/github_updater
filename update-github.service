@@ -1,0 +1,23 @@
+# fichier de config de service systemd /etc/systemd/system/update-github.service
+[Unit]
+Description=Met à jour le repo github NOTES-DE-COURS si aucun commit public n'a été effectué dans les 24h
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=adam
+WorkingDirectory=/home/adam/dev/projets/NOTES-DE-COURS
+ExecStart=/home/adam/dev/scripts/updateGithub.sh
+
+Restart=on-failure
+RestartSec=3000
+StartLimitBurst=3
+StartLimitIntervalSec=3000
+
+# Logs
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
