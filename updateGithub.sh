@@ -133,6 +133,8 @@ send_commit() {
   fi
 }
 
+# -- MAIN --
+
 nb_cycle=0
 while true; do
   ((nb_cycle++))
