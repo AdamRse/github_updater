@@ -1,15 +1,13 @@
-# fichier de config de service systemd /etc/systemd/system/update-github.service
-# recharger la config systemd : sudo systemctl daemon-reload
 [Unit]
-Description=Met à jour le repo github NOTES-DE-COURS si aucun commit public n'a été effectué dans les 24h
+Description=Met à jour le repo github si aucun commit public n'a été effectué
 After=network-online.target
 Wants=network-online.target
 
 [Service]
 Type=simple
-User=adam
-WorkingDirectory=<chemin absolu vers le repo git à modifier>
-ExecStart=<chemin absolu vers le script updateGithub.sh>
+User=votre_utilisateur
+WorkingDirectory=/chemin/absolu/vers/votre/repo
+ExecStart=/chemin/absolu/vers/updateGithub.sh
 
 Restart=on-failure
 RestartSec=3000
