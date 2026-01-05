@@ -121,10 +121,10 @@ get_last_commit_date() {
   fi
   
   echo "${response}" \
-  | jq -r '
+  | jq -r --arg username "$USERNAME" '
     .[]
     | select(.type == "PushEvent")
-    | select(.actor.login == "$USERNAME")
+    | select(.actor.login == $username)
     | .created_at
     | select(. != null)
     ' \
