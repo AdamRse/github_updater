@@ -1,7 +1,11 @@
 #!/bin/bash
 
+source "zszefzef"
+
+echo "ok"
+
 test() {
-  true || return 1
+  false || return 1
   return 0
 }
 

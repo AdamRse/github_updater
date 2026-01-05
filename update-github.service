@@ -8,8 +8,8 @@ Wants=network-online.target
 [Service]
 Type=simple
 User=adam
-WorkingDirectory=/home/adam/dev/projets/NOTES-DE-COURS
-ExecStart=/home/adam/dev/projets/github_updater/updateGithub.sh
+WorkingDirectory=<chemin absolu vers le repo git à modifier>
+ExecStart=<chemin absolu vers le script updateGithub.sh>
 
 Restart=on-failure
 RestartSec=3000

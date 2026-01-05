@@ -2,35 +2,28 @@
 
 # SYSTEMD
 # Nom du service : update-github.service
-# Pour modifier $hour_limit, il faut redémarrer les service pour être pris en compte :
+# Pour modifier $HOUR_LIMIT, il faut redémarrer les service pour être pris en compte :
 # sudo systemctl restart update-github.service
 #
 # Logs : journalctl -u update-github.service -f
 
+# -- VARIABLES --
 
-USERNAME="AdamRse"
-API_URL="https://api.github.com/users/$USERNAME/events/public"
-REPO_PATH="/home/adam/dev/projets/NOTES-DE-COURS"
+script_path=$(readlink -f "$0")
+script_dir=$(dirname "${script_path}")
+env_location="${script_dir}/.env"
+required_env_vars=(
+    "USERNAME"
+    "API_URL"
+    "REPO_PATH"
+    "HOUR_LIMIT"
+    "QUOTES_FILE"
+    "QUOTE_OUTPUT_FILE"
+)
 
+# -- CHECKS --
 
-hour_limit=23
-sleep_limit=$((hour_limit * 3600))
-
-fichier_citations="/home/adam/.config/script/citations.txt"
-fichier_sortie="/home/adam/dev/projets/NOTES-DE-COURS/citation_du_jour"
-
-# Checks
-
-if [ ! -d "${REPO_PATH}" ]; then
-  echo "ERREUR: Impossible d'accéder à '${REPO_PATH}'" >&2
-  exit 1
-fi
-
-if ! git rev-parse --git-dir > /dev/null 2>&1; then
-    echo "ERREUR: '${REPO_PATH}' n'est pas un repository git" >&2
-    exit 1
-fi
-
+# Packages
 need_package=""
 for cmd in curl jq git; do
   if ! command -v "$cmd" >/dev/null 2>&1; then
@@ -46,21 +39,55 @@ if [ -n "${need_package}" ]; then
   exit 1
 fi
 
+# Environment
+if [ ! -f "${env_location}" ]; then
+  echo "ERREUR: Impossible de trouver le fichier des variables d'environnement. Fichier recherché : '${env_location}'" >&2
+  exit 1
+fi
+source "${env_location}"
+env_var_missing=""
+for var in "${required_env_vars[@]}"; do
+  if [ -z "${!var}" ]; then
+    if [ -z "${env_var_missing}" ]; then
+      env_var_missing="Erreur, il manque des variables dans de .env ('${env_location}')\n\tLa variable ${var} est requise"
+    else
+      env_var_missing="${env_var_missing}\n\tLa variable ${var} est requise"
+    fi
+  fi
+done
+if [ -n "${env_var_missing}" ]; then
+  echo -e "${env_var_missing}" >&2
+  exit 1
+fi
+
+# Other
+if [ ! -d "${REPO_PATH}" ]; then
+  echo "ERREUR: Impossible d'accéder à '${REPO_PATH}'" >&2
+  exit 1
+fi
+
+if ! git -C "${REPO_PATH}" rev-parse --git-dir > /dev/null 2>&1; then
+  echo "ERREUR: '${REPO_PATH}' n'est pas un repository git" >&2
+  exit 1
+fi
+
+# -- FONCTIONS --
+
 # Fonction pour obtenir une citation aléatoire
 obtenir_citation_aleatoire() {
   [ -z "$1" ] && echo "obtenir_citation_aleatoire() ERREUR : 1 paramètre requis pour le chemin du fichier" >&2 && return 1
 
-  local fichier_citations_loc=$1
+  local QUOTES_FILE_loc=$1
   local id=$(date +%s%N | md5sum | head -c20)
 
   # Vérifier si le fichier de citations existe
-  if [ ! -f "${fichier_citations_loc}" ]; then
+  if [ ! -f "${QUOTES_FILE_loc}" ]; then
     echo "ERREUR: ${id}" >&2
-    echo "Erreur : Le fichier ${fichier_citations_loc} n'existe pas" >&2
+    echo "Erreur : Le fichier ${QUOTES_FILE_loc} n'existe pas" >&2
     return 1
   fi
 
-  local nombre_citations=$(grep -c "\*\*/" "${fichier_citations_loc}")
+  local nombre_citations=$(grep -c "\*\*/" "${QUOTES_FILE_loc}")
 
   # Si on a bien un vombre positif de citations
   if [[ "${nombre_citations}" =~ ^[0-9]+$ ]] && (( nombre_citations > 0 )); then
@@ -68,7 +95,7 @@ obtenir_citation_aleatoire() {
     local index_aleatoire=$((RANDOM % nombre_citations + 1))
 
     # Extraire la citation choisie
-    local citation=$(awk -v num="${index_aleatoire}" 'BEGIN{RS="**/"} NR==num {print}' "${fichier_citations_loc}")
+    local citation=$(awk -v num="${index_aleatoire}" 'BEGIN{RS="**/"} NR==num {print}' "${QUOTES_FILE_loc}")
 
     # Nettoyer la citation
     citation=$(echo "${citation}" | tr -d '\n' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
@@ -100,7 +127,7 @@ get_last_commit_date() {
 }
 make_change_and_commit() {
   local error_msg="";
-  obtenir_citation_aleatoire "${fichier_citations}" > "${fichier_sortie}" || error_msg="Impossible de remplacer le fichier de citation '${fichier_sortie}'"
+  obtenir_citation_aleatoire "${QUOTES_FILE}" > "${QUOTE_OUTPUT_FILE}" || error_msg="Impossible de remplacer le fichier de citation '${QUOTE_OUTPUT_FILE}'"
   local commit_id="$(date +%s%N | md5sum | head -c5)"
   git add . && git commit -m "${commit_id}" || error_msg="Erreur lors de la création du commit ${commit_id}"
 
@@ -136,6 +163,7 @@ send_commit() {
 # -- MAIN --
 
 nb_cycle=0
+sleep_limit=$((HOUR_LIMIT * 3600))
 while true; do
   ((nb_cycle++))
   echo ""
@@ -149,16 +177,16 @@ while true; do
   #Date API vide
   if [ -z "${LAST_PUSH_DATE}" ]; then
     echo "Aucun commit public trouvé" >&2
-    echo "Création du commit, nouvelle tentative dans ${hour_limit}h"
+    echo "Création du commit, nouvelle tentative dans ${HOUR_LIMIT}h"
     send_commit
-    sleep "$sleep_limit"
+    sleep "${sleep_limit}"
     continue
   fi
 
   # Date API non conforme
   if ! last_commit_ts=$(date -d "${LAST_PUSH_DATE}" +%s 2>/dev/null); then
     echo "Date invalide dans last_push_date : ${LAST_PUSH_DATE}" >&2
-    echo "Envoi du commit par sécurité, nouvelle tentative dans ${hour_limit}h" >&2
+    echo "Envoi du commit par sécurité, nouvelle tentative dans ${HOUR_LIMIT}h" >&2
     send_commit
     sleep "${sleep_limit}"
     continue
@@ -167,15 +195,15 @@ while true; do
   now_ts=$(date +%s)
   elapsed=$((now_ts - last_commit_ts))
 
-  # Le dernier commit est plus récent que ${hour_limit} heures, on se rendord pour atteindre >=${hour_limit}
+  # Le dernier commit est plus récent que ${HOUR_LIMIT} heures, on se rendord pour atteindre >=${HOUR_LIMIT}
   if [ "${elapsed}" -lt "${sleep_limit}" ]; then
     remaining=$((sleep_limit - elapsed))
     echo "Dernier commit il y a $((elapsed / 3600))h, pas de commit à envoyer, attente $((remaining / 3600))h"
     sleep "${remaining}"
-  else # Le dernier commit est plus ancien ou égal à ${hour_limit}
-    echo "Dernier commit >= ${hour_limit} heures, envoi d'un nouveau commit."
+  else # Le dernier commit est plus ancien ou égal à ${HOUR_LIMIT}
+    echo "Dernier commit >= ${HOUR_LIMIT} heures, envoi d'un nouveau commit."
     send_commit
-    echo "nouveau cycle prévu dans ${hour_limit} heures"
+    echo "nouveau cycle prévu dans ${HOUR_LIMIT} heures"
     sleep "${sleep_limit}"
   fi
 done
