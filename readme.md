@@ -1,6 +1,6 @@
 # Script de mise à jour automatique GitHub
 
-Script Bash automatisant les commits sur un dépôt GitHub selon un cycle temporel défini. Si aucun commit public n'a été effectué pendant une durée spécifiée, le script génère automatiquement un commit avec une citation aléatoire.
+Script Bash pour linux automatisant les commits sur un dépôt GitHub selon un cycle temporel défini. Si aucun commit public n'a été effectué pendant une durée spécifiée, le script génère automatiquement un commit avec une citation aléatoire.
 
 ## Fonctionnement
 
