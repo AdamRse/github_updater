@@ -66,6 +66,11 @@ if [ ! -d "${REPO_PATH}" ]; then
   exit 1
 fi
 
+if [ ! -f "${QUOTES_FILE}" ]; then
+  echo "ERREUR: Impossible d'accéder au fichier de citations '${QUOTES_FILE}'" >&2
+  exit 1
+fi
+
 if ! git -C "${REPO_PATH}" rev-parse --git-dir > /dev/null 2>&1; then
   echo "ERREUR: '${REPO_PATH}' n'est pas un repository git" >&2
   exit 1
@@ -159,6 +164,22 @@ send_commit() {
     return 1
   fi
 }
+
+# -- SUMMARY --
+
+echo "PARAMÉTRAGE RÉUSSI !"
+echo "---------------------"
+echo ""
+echo "Résumée des paramètres :"
+echo ""
+echo "-Utilsiateur : ${USERNAME}"
+echo "-Cycles de ${HOUR_LIMIT}h"
+echo "-Repository cible : ${REPO_PATH}"
+echo "-Fichier de liste de citations : ${QUOTES_FILE}"
+echo "-Fichier de citation à modifier : ${QUOTE_OUTPUT_FILE}"
+echo "---------------------"
+echo ""
+echo "Début du premier cycle"
 
 # -- MAIN --
 
