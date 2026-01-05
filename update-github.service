@@ -1,4 +1,5 @@
 # fichier de config de service systemd /etc/systemd/system/update-github.service
+# recharger la config systemd : sudo systemctl daemon-reload
 [Unit]
 Description=Met à jour le repo github NOTES-DE-COURS si aucun commit public n'a été effectué dans les 24h
 After=network-online.target
@@ -13,7 +14,6 @@ ExecStart=/home/adam/dev/projets/github_updater/updateGithub.sh
 Restart=on-failure
 RestartSec=3000
 StartLimitBurst=3
-StartLimitIntervalSec=3000
 
 # Logs
 StandardOutput=journal
