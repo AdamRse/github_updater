@@ -8,7 +8,7 @@ Wants=network-online.target
 Type=simple
 User=adam
 WorkingDirectory=/home/adam/dev/projets/NOTES-DE-COURS
-ExecStart=/home/adam/dev/scripts/updateGithub.sh
+ExecStart=/home/adam/dev/projets/github_updater/updateGithub.sh
 
 Restart=on-failure
 RestartSec=3000
